@@ -1,17 +1,5 @@
 # press F5 to copy this to a day file
 from get_src import *
-
-sample = """L68
-L30
-R48
-L5
-R60
-L55
-L1
-L99
-R14
-L82
-"""
 inp = get()
 
 n = 50
