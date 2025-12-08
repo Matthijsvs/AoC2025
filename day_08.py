@@ -5,39 +5,38 @@ inp = get()
 
 coords = []
 for i in inp.splitlines():
-    x,y,z=i.split(",")
-    coords.append((int(x),int(y),int(z)))
+    x,y,z=list(map(int,i.split(",")))
+    coords.append(Point3(x,y,z))
 
 def dist(a,b):
-    d = math.sqrt((coords[b][0] - coords[a][0])**2 + (coords[b][1] - coords[a][1])**2 + (coords[b][2] - coords[a][2])**2)
+    d = math.sqrt((coords[b].x - coords[a].x)**2 + (coords[b].y - coords[a].y)**2 + (coords[b].z - coords[a].z)**2)
     return d
 
-pairs = []
+#build distance list
 dist_list=[]
+
 for i in range(len(coords)):
     min_dist = 1e9
-    p = -1
+    partner = -1
     for j in range(i+1,len(coords)):
-        if i!=j:
-            s = dist(i,j)
-            dist_list.append((s,i,j))
-            if s<min_dist:
-                min_dist=s
-                p = j
-    if i!=j:
-        pairs.append((i,p))
-dist_list.sort()
+        distance = dist(i, j)
+        dist_list.append((distance, i, j))
+        if distance<min_dist:
+            min_dist=distance
+            partner = j
+dist_list.sort()    #sort tuples by lowest distance
 
 
+#every junction is its own group
 groups=[[x] for x in range(len(inp.splitlines()))]
-conns=0
-while conns<1000:
-    i = dist_list.pop(0)
-    distance,a,b=i
+
+def make_connection():
+    i = dist_list.pop(0)    #take current lowest distance
+    distance, a, b = i
+    sum_b = coords[a].x * coords[b].x
     for x in range(len(groups)):
         j = groups[x]
         if a in j and b in j:
-            conns+=1
             break
         elif a in j:
             for y in groups:
@@ -45,7 +44,6 @@ while conns<1000:
                     j.extend(y)
                     groups.remove(y)
                     break
-            conns += 1
             break
         elif b in j:
             for y in groups:
@@ -53,36 +51,17 @@ while conns<1000:
                     j.extend(y)
                     groups.remove(y)
                     break
-            conns += 1
             break
-sizes=[]
-for j in groups:
-    sizes.append(len(set(j)))
-sizes.sort(reverse=True)
-print(math.prod(sizes[:3]))
+    return sum_b
 
-#continue until list is empty
+
+for i in range(1000):
+    make_connection()
+group_size = [len(x) for x in groups]
+group_size.sort(reverse=True)
+print(math.prod(group_size[:3]))
+
+#continue until all junctions are connected
 while len(groups)>1:
-    i = dist_list.pop(0)
-    distance,a,b=i
-    sum_b=coords[a][0]*coords[b][0]
-    for x in range(len(groups)):
-        j = groups[x]
-        if a in j and b in j:
-            break
-        elif a in j:
-            for y in groups:
-                if b in y:
-                    j.extend(y)
-                    groups.remove(y)
-                    break
-            break
-        elif b in j:
-            for y in groups:
-                if a in y:
-                    j.extend(y)
-                    groups.remove(y)
-                    break
-            break
-
+    sum_b = make_connection()
 print(sum_b)
