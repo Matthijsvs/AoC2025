@@ -17,13 +17,11 @@ dist_list=[]
 
 for i in range(len(coords)):
     min_dist = 1e9
-    partner = -1
     for j in range(i+1,len(coords)):
         distance = dist(i, j)
         dist_list.append((distance, i, j))
         if distance<min_dist:
             min_dist=distance
-            partner = j
 dist_list.sort()    #sort tuples by lowest distance
 
 
@@ -32,8 +30,8 @@ groups=[[x] for x in range(len(inp.splitlines()))]
 
 def make_connection():
     i = dist_list.pop(0)    #take current lowest distance
-    distance, a, b = i
-    sum_b = coords[a].x * coords[b].x
+    _, a, b = i
+    x_product = coords[a].x * coords[b].x
     for x in range(len(groups)):
         j = groups[x]
         if a in j and b in j:
@@ -52,9 +50,9 @@ def make_connection():
                     groups.remove(y)
                     break
             break
-    return sum_b
+    return x_product
 
-
+#first connect 1000 junctions:
 for i in range(1000):
     make_connection()
 group_size = [len(x) for x in groups]
