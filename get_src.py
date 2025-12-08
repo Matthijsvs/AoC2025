@@ -34,7 +34,7 @@ def get(sample=None):
             f.write(ans.text)
             return ans.text
 
-    print(f"getting {fname}")  # dump text from file
+    print(f"getting {fname} from cache")  # dump text from file
     with open(fname) as f:
         return f.read()
 
